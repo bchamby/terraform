@@ -76,8 +76,8 @@ resource "aws_security_group" "allow-http" {
 
 resource "aws_route53_record" "www" {
   zone_id = "Z36Z4PT7NFJUY"
-  name = "www.chamby.io"
-  type = "CNAME"
-  ttl = "300"
+  name    = "www.chamby.io"
+  type    = "CNAME"
+  ttl     = "300"
   records = ["${aws_elb.chambyweb-elb.dns_name}"]
 }
