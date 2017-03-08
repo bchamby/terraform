@@ -81,7 +81,7 @@ resource "aws_security_group" "allow-http" {
   }
 }
 
-resource "aws_route53_record" "www" {
+resource "aws_route53_record" "blog" {
   zone_id = "${var.dns_zone_id}"
   name    = "${var.dns_www_name}"
   type    = "CNAME"
