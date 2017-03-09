@@ -4,8 +4,19 @@ provider "aws" {
   region     = "${var.region}"
 }
 
-resource "aws_elb" "chambyweb-elb" {
-  name               = "chambyweb-elb"
+resource "aws_db_instance" "chambywp-db" {
+    allocated_storage       = 5
+    engine                  = "mysql"
+    engine_version          = "5.6.27"
+    instance_class          = "db.t2.micro"
+    username                = "wordpressuser"
+    password                = "${var.mysql_password}"
+    name                    = "wordpressdb"
+    backup_retention_period = 0
+}
+
+resource "aws_elb" "chambywp-elb" {
+  name               = "chambywp-elb"
   availability_zones = "${var.availability_zones}"
 
   listener {
@@ -25,19 +36,19 @@ resource "aws_elb" "chambyweb-elb" {
 
 }
 
-resource "aws_autoscaling_group" "chambyweb-asg" {
+resource "aws_autoscaling_group" "chambywp-asg" {
   availability_zones        = "${var.availability_zones}"
-  name                      = "chambyweb-us-east"
+  name                      = "chambywp-us-east"
   min_size                  = "${var.asg_min_size}"
   max_size                  = "${var.asg_max_size}"
   desired_capacity          = "${var.asg_desired_size}"
   force_delete              = true
-  launch_configuration      = "${aws_launch_configuration.chambyweb-lc.name}"
-  load_balancers            = ["${aws_elb.chambyweb-elb.name}"]
+  launch_configuration      = "${aws_launch_configuration.chambywp-lc.name}"
+  load_balancers            = ["${aws_elb.chambywp-elb.name}"]
 }
 
-resource "aws_launch_configuration" "chambyweb-lc" {
-  name            = "chambyweb-lc"
+resource "aws_launch_configuration" "chambywp-lc" {
+  name            = "chambywp-lc"
   image_id        = "${var.ami_id}"
   instance_type   = "${var.instance_type}"
   security_groups = ["${aws_security_group.allow-http.id}"]
@@ -63,9 +74,9 @@ resource "aws_security_group" "allow-http" {
   }
 
   ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -77,7 +88,7 @@ resource "aws_security_group" "allow-http" {
   }
 
   tags {
-    Name = "chambyweb"
+    Name = "chambywp"
   }
 }
 
@@ -86,5 +97,5 @@ resource "aws_route53_record" "blog" {
   name    = "${var.dns_www_name}"
   type    = "CNAME"
   ttl     = "300"
-  records = ["${aws_elb.chambyweb-elb.dns_name}"]
+  records = ["${aws_elb.chambywp-elb.dns_name}"]
 }

@@ -20,3 +20,5 @@ variable "instance_type" {}
 variable "key_name" {}
 variable "dns_zone_id" {}
 variable "dns_www_name" {}
+variable "mysql_password" {}
+variable "vpc_id" {}
