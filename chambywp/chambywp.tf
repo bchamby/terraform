@@ -5,14 +5,14 @@ provider "aws" {
 }
 
 resource "aws_db_instance" "chambywp-db" {
-    allocated_storage       = 5
-    engine                  = "mysql"
-    engine_version          = "5.6.27"
-    instance_class          = "db.t2.micro"
-    username                = "wordpressuser"
-    password                = "${var.mysql_password}"
-    name                    = "wordpressdb"
-    backup_retention_period = 0
+  allocated_storage       = 5
+  engine                  = "mysql"
+  engine_version          = "5.6.27"
+  instance_class          = "db.t2.micro"
+  username                = "wordpressuser"
+  password                = "${var.mysql_password}"
+  name                    = "wordpressdb"
+  backup_retention_period = 0
 }
 
 resource "aws_elb" "chambywp-elb" {
@@ -42,7 +42,6 @@ resource "aws_autoscaling_group" "chambywp-asg" {
   min_size                  = "${var.asg_min_size}"
   max_size                  = "${var.asg_max_size}"
   desired_capacity          = "${var.asg_desired_size}"
-  force_delete              = true
   launch_configuration      = "${aws_launch_configuration.chambywp-lc.name}"
   load_balancers            = ["${aws_elb.chambywp-elb.name}"]
 }
